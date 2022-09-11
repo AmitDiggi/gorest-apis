@@ -1,62 +1,59 @@
-import io.restassured.http.ContentType;
-import io.restassured.response.Response;
 import org.hamcrest.Matchers;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import users.UserService;
+import users.UsersClient;
+import users.create.CreateUserRequestBody;
+import users.create.response.CreateUserResponse;
 
-import static io.restassured.RestAssured.given;
+import java.util.UUID;
+
 
 public class CreateUserTests {
+
+    private UserService userService;
+
+    @BeforeClass
+    public void beforeClass(){
+        userService = new UserService();
+    }
 
     @Test
     public void shouldCreateMaleUser(){
 
+
         //Arrange
-        String body = "{\n" +
-                "    \"name\": \"guru\",\n" +
-                "    \"email\": \"guru213@abc.com\",\n" +
-                "    \"gender\": \"male\",\n" +
-                "    \"status\": \"active\"\n" +
-                "}";
+        String email = UUID.randomUUID() + "@gmail.com";
+
+        //  CreateUserRequestBody requestBody = new CreateUserRequestBody(name,gender,email,status);
+     //   CreateUserRequestBody requestBody = CreateUserRequestBody.builder().name("guru").gender("male").email(email).status("active").build();
+
+        CreateUserRequestBody createUserRequestBody = new CreateUserRequestBody.Builder().gender("male").build();
 
         //Action
-        createUser(body)
-                .then()
-                .log().body()
+       // usersClient.createUser(requestBody);
+        CreateUserResponse createUserResponse = userService.createUser(createUserRequestBody);
 
         //Assert
-        .statusCode(201)
-                .body("id", Matchers.notNullValue())
-                .body("email", Matchers.equalTo("guru213@abc.com"));
+        createUserResponse.assertUser(createUserRequestBody);
+
+
     }
 
     @Test
     public void shouldCreateFemaleUser(){
 
         //Arrange
-        String body = "{\n" +
-                "    \"name\": \"aditi\",\n" +
-                "    \"email\": \"aditi.rao@abc.com\",\n" +
-                "    \"gender\": \"female\",\n" +
-                "    \"status\": \"active\"\n" +
-                "}";
-       //Act
-        createUser(body)
-                .then()
-                .log().body()
+        String email = UUID.randomUUID() + "@gmail.com";
+       // CreateUserRequestBody requestBody = CreateUserRequestBody.builder().name("aditi").gender("female").email(email).status("active").build();
+        CreateUserRequestBody createUserRequestBody = new CreateUserRequestBody.Builder().gender("female").build();
+
+        //Act
+        CreateUserResponse createUserResponse = userService.createUser(createUserRequestBody);
+
         //Assert
-        .statusCode(201)
-                .body("id", Matchers.notNullValue())
-                .body("email", Matchers.equalTo("aditi.rao@abc.com"));
+        createUserResponse.assertUser(createUserRequestBody);
     }
 
-    private static Response createUser(String body) {
-        return given()
-                .accept(ContentType.JSON)
-                .contentType(ContentType.JSON)
-                .header("Authorization", "Bearer d33706d1eb07d903da18b04a08c1b9bfc438e4073c356477fe86c765fb023966")
-                .body(body)
-
-                .when()
-                .post("https://gorest.co.in/public/v2/users");
-    }
 }
