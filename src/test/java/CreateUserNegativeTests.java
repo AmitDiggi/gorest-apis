@@ -46,7 +46,7 @@ public class CreateUserNegativeTests {
         //Assert
         Assert.assertEquals(errorResponse.getStatusCode(),422);
         errorResponse.assertHasError("gender", "can't be blank, can be male of female");
-        errorResponse.assertHasError("status", "can't be blank");
+        errorResponse.assertHasError("status", "can't be blank...");
 
 
     }
